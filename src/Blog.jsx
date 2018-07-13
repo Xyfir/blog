@@ -154,7 +154,10 @@ export default class Blog extends React.Component {
             .sort((a, b) => a.posted < b.posted)
             .slice(0, 10)
             .map(p => (
-              <li key={p.id} className="post">
+              <li
+                key={p.id}
+                className={`post ${p.id == post.id ? 'current-post' : ''}`}
+              >
                 <a
                   href={linkFormat.replace('{{post.id}}', p.id)}
                   className="title"
