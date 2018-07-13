@@ -24,7 +24,20 @@ export default class Blog extends React.Component {
 
     this.state = {
       search: '',
+      /**
+       * @typedef {object} Post
+       * @prop {string} id
+       * @prop {string} [group]
+       * @prop {string} [title]
+       * @prop {string} [author]
+       * @prop {string} [posted]
+       * @prop {string} [edited]
+       * @prop {boolean} loading
+       * @prop {string} [canonical]
+       */
+      /** @type {Post[]} */
       posts: [],
+      /** @type {Post} */
       post: null
     };
   }
@@ -44,7 +57,11 @@ export default class Blog extends React.Component {
       .catch(console.error);
   }
 
-  /** Handle setting `state.post` from `props.post`. */
+  /**
+   * Handle setting `state.post` from `props.post`.
+   * @param {BlogProps} props
+   * @param {Blog.state} state
+   */
   static getDerivedStateFromProps(props, state) {
     const { post: postId } = props;
     const { post } = state;
@@ -60,10 +77,11 @@ export default class Blog extends React.Component {
     return null;
   }
 
-  /** Load new post if needed. */
+  /** Load new post if needed. Update canonical link. */
   componentDidUpdate() {
     const { post } = this.state;
     if (post && post.loading) this._loadPost();
+    else this._setCanonical(post);
   }
 
   /**
@@ -84,8 +102,34 @@ export default class Blog extends React.Component {
       .then(content => {
         post.content = content;
         this.setState({ post });
+        this._setCanonical(post);
       })
       .catch(console.error);
+  }
+
+  /** @param {Post} post */
+  _setCanonical(post) {
+    let link = document.querySelector('link[rel="canonical"]');
+
+    // Set <link rel='canonical' href='...' />
+    if (post && post.canonical) {
+      // Element already exists
+      if (link) {
+        link.href = post.canonical;
+      }
+      // Create element
+      else {
+        link = document.createElement('link');
+        link.rel = 'canonical';
+        link.href = post.canonical;
+        link.dataset.xy = true;
+        document.head.appendChild(link);
+      }
+    }
+    // We created a canonical link element we need to delete
+    else if (link && link.dataset.xy && (!post || !post.canonical)) {
+      link.remove();
+    }
   }
 
   render() {
