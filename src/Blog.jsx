@@ -146,11 +146,15 @@ export default class Blog extends React.Component {
         />
 
         <ul className="new-posts">
+          <li className="view-all">
+            <a href={linkFormat.replace('{{post.id}}', '')}>View All Posts</a>
+          </li>
+
           {posts
             .sort((a, b) => a.posted < b.posted)
             .slice(0, 10)
             .map(p => (
-              <li key={p.id}>
+              <li key={p.id} className="post">
                 <a
                   href={linkFormat.replace('{{post.id}}', p.id)}
                   className="title"
