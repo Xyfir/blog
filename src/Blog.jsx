@@ -146,16 +146,19 @@ export default class Blog extends React.Component {
         />
 
         <ul className="new-posts">
-          {posts.slice(0, 10).map(p => (
-            <li key={p.id}>
-              <a
-                href={linkFormat.replace('{{post.id}}', p.id)}
-                className="title"
-              >
-                {p.title}
-              </a>
-            </li>
-          ))}
+          {posts
+            .sort((a, b) => a.posted < b.posted)
+            .slice(0, 10)
+            .map(p => (
+              <li key={p.id}>
+                <a
+                  href={linkFormat.replace('{{post.id}}', p.id)}
+                  className="title"
+                >
+                  {p.title}
+                </a>
+              </li>
+            ))}
         </ul>
       </div>
     ) : (
@@ -174,6 +177,7 @@ export default class Blog extends React.Component {
             .filter(
               p => p.title.indexOf(search) > -1 || p.group.indexOf(search) > -1
             )
+            .sort((a, b) => a.posted < b.posted)
             .map(p => (
               <li key={p.id}>
                 <a
