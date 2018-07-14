@@ -1,0 +1,44 @@
+{
+  "name": "@xyfir/blog",
+  "version": "0.1.0",
+  "description": "A simple blog system that's easily integrated into existing sites. Markdown + React + GitHub.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "npm run build:js & npm run build:css",
+    "build:js": "webpack-cli",
+    "build:css": "node-sass src/blog.scss dist/blog.css --output-style compressed"
+  },
+  "prettier": {
+    "singleQuote": true
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Xyfir/blog.git"
+  },
+  "keywords": [
+    "blog",
+    "react",
+    "markdown",
+    "github",
+    "simple"
+  ],
+  "author": "Xyfir, LLC <contact@xyfir.com> (https://xyfir.com/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Xyfir/blog/issues"
+  },
+  "homepage": "https://github.com/Xyfir/blog#readme",
+  "dependencies": {
+    "marked": "^0.4.0",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1",
+    "node-sass": "^4.9.2",
+    "webpack": "^4.16.0"
+  }
+}
