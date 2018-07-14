@@ -1,6 +1,23 @@
 import marked from 'marked';
 import React from 'react';
 
+const Stats = ({ post }) => (
+  <ul className="post-stats">
+    <li className="group">{post.group}</li>
+    <li className="posted">
+      Posted on <span className="date">{post.posted}</span>
+    </li>
+    <li className="author">
+      By <span className="name">{post.author}</span>
+    </li>
+    {post.edited ? (
+      <li className="edited">
+        Edited on <span className="date">{post.edited}</span>
+      </li>
+    ) : null}
+  </ul>
+);
+
 export default class Blog extends React.Component {
   /**
    * @typedef {object} BlogProps
@@ -138,35 +155,46 @@ export default class Blog extends React.Component {
 
     return post && !post.loading ? (
       <div className="xyfir-blog view-post">
-        <article
-          dangerouslySetInnerHTML={{
-            __html: marked(post.content, markedOptions)
-          }}
-          className="blog-post markdown"
-        />
+        <article className="blog-post">
+          <header>
+            <h1>{post.title}</h1>
+            <Stats post={post} />
+          </header>
 
-        <ul className="new-posts">
-          <li className="view-all">
-            <a href={linkFormat.replace('{{post.id}}', '')}>View All Posts</a>
-          </li>
+          <div
+            dangerouslySetInnerHTML={{
+              __html: marked(post.content, markedOptions)
+            }}
+            className="markdown-body"
+          />
+        </article>
 
-          {posts
-            .sort((a, b) => a.posted < b.posted)
-            .slice(0, 10)
-            .map(p => (
-              <li
-                key={p.id}
-                className={`post ${p.id == post.id ? 'current-post' : ''}`}
-              >
-                <a
-                  href={linkFormat.replace('{{post.id}}', p.id)}
-                  className="title"
+        <nav className="recent-posts">
+          <span className="title">Recent Posts</span>
+
+          <ul className="new-posts">
+            {posts
+              .sort((a, b) => a.posted < b.posted)
+              .slice(0, 10)
+              .map(p => (
+                <li
+                  key={p.id}
+                  className={`post ${p.id == post.id ? 'current-post' : ''}`}
                 >
-                  {p.title}
-                </a>
-              </li>
-            ))}
-        </ul>
+                  <a
+                    href={linkFormat.replace('{{post.id}}', p.id)}
+                    className="title"
+                  >
+                    {p.title}
+                  </a>
+                </li>
+              ))}
+
+            <li className="view-all">
+              <a href={linkFormat.replace('{{post.id}}', '')}>All posts ...</a>
+            </li>
+          </ul>
+        </nav>
       </div>
     ) : (
       <div className="xyfir-blog explore">
@@ -177,6 +205,7 @@ export default class Blog extends React.Component {
             this.setState({ search: e.target.value.toLowerCase() })
           }
           className="search"
+          placeholder="Search posts..."
         />
 
         <ul className="posts">
@@ -194,15 +223,7 @@ export default class Blog extends React.Component {
                   {p.title}
                 </a>
 
-                <ul className="stats">
-                  <li className="group">{p.group}</li>
-                  <li className="posted">
-                    Posted on {p.posted} by {p.author}
-                  </li>
-                  {p.edited ? (
-                    <li className="edited">Edited on {p.edited}</li>
-                  ) : null}
-                </ul>
+                <Stats post={p} />
               </li>
             ))}
         </ul>
