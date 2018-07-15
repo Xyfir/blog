@@ -38,7 +38,7 @@ div.xyfir-blog.explore {
     margin: 0;
 
     > li {
-      margin: 1em;
+      margin: 1em 0;
       border-bottom: solid 0.1em #eee;
       padding-bottom: 1em;
 
@@ -48,8 +48,12 @@ div.xyfir-blog.explore {
 
       > a.title {
         color: #2196f3;
-        font-size: 3em;
+        font-size: 2em;
         text-decoration: none;
+      }
+
+      > p.description {
+        margin: 0.4em 0em;
       }
     }
   }
@@ -105,12 +109,13 @@ div.xyfir-blog.view-post {
     display: flex;
 
     > article.blog-post {
-      padding: 2em 3em;
+      padding: 2em 3rem;
     }
 
     > nav.recent-posts {
-      padding: 2em 0;
       flex: 1;
+      padding: 2em 3rem;
+      padding-left: 0;
 
       > ul.new-posts {
         width: 20vw;
