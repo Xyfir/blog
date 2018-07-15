@@ -23,6 +23,12 @@ export default class Blog extends React.Component {
    * @typedef {object} BlogProps
    * @prop {MarkedOptions} [markedOptions] - Passed to `marked('', options)` when
    *  converting Markdown to HTML. See: https://marked.js.org
+   * @prop {string[]} [descriptionFormat] - Format to use for the page
+   *  descriptions. First element is for when _not_ viewing a post, and the
+   *  second element is for when the user _is_ viewing a post.
+   * @prop {string[]} [titleFormat] - Format to use for the page title.
+   *  First element is for when _not_ viewing a post, and the second element
+   *  is for when the user _is_ viewing a post.
    * @prop {string} repository - GitHub repository id.
    *  Example: `":user/:repo" | "Xyfir/blog-posts"`
    * @prop {string[]} [groups] - Groups from the repo to allow posts from.
@@ -98,7 +104,11 @@ export default class Blog extends React.Component {
   componentDidUpdate() {
     const { post } = this.state;
     if (post && post.loading) this._loadPost();
-    else this._setCanonical(post);
+    else this._setPageMetadata(post);
+  }
+
+  componentWillUnmount() {
+    this._setPageMetadata();
   }
 
   /**
@@ -119,16 +129,49 @@ export default class Blog extends React.Component {
       .then(content => {
         post.content = content;
         this.setState({ post });
-        this._setCanonical(post);
+        this._setPageMetadata(post);
       })
       .catch(console.error);
   }
 
-  /** @param {Post} post */
-  _setCanonical(post) {
-    let link = document.querySelector('link[rel="canonical"]');
+  /** @param {Post} [post] */
+  _setPageMetadata(post) {
+    const { titleFormat, descriptionFormat } = this.props;
+
+    // Set <title>
+    if (Array.isArray(titleFormat)) {
+      document.title = post
+        ? this._format(titleFormat[1], post)
+        : titleFormat[0];
+    }
+
+    // Set <meta name="description" content="..." />
+    let meta = document.querySelector('meta[name="description"]');
+    if (Array.isArray(descriptionFormat)) {
+      // Element already exists
+      if (meta) {
+        meta.content = post
+          ? this._format(descriptionFormat[1], post)
+          : descriptionFormat[0];
+      }
+      // Create element
+      else {
+        meta = document.createElement('meta');
+        meta.name = 'description';
+        meta.content = post
+          ? this._format(descriptionFormat[1], post)
+          : descriptionFormat[0];
+        meta.dataset.xy = true;
+        document.head.appendChild(meta);
+      }
+    }
+    // We created a description meta element we need to delete
+    else if (meta && meta.dataset.xy && (!post || !post.description)) {
+      meta.remove();
+    }
 
     // Set <link rel='canonical' href='...' />
+    let link = document.querySelector('link[rel="canonical"]');
     if (post && post.canonical) {
       // Element already exists
       if (link) {
@@ -147,6 +190,15 @@ export default class Blog extends React.Component {
     else if (link && link.dataset.xy && (!post || !post.canonical)) {
       link.remove();
     }
+  }
+
+  /**
+   * @param {string} format
+   * @param {Post} [post]
+   * @return {string}
+   */
+  _format(format, post = {}) {
+    return format.replace(/\{\{post\.(\w+)\}\}/g, (m, $1) => post[$1] || '');
   }
 
   render() {
@@ -184,17 +236,14 @@ export default class Blog extends React.Component {
                   key={p.id}
                   className={`post ${p.id == post.id ? 'current-post' : ''}`}
                 >
-                  <a
-                    href={linkFormat.replace('{{post.id}}', p.id)}
-                    className="title"
-                  >
+                  <a href={this._format(linkFormat, p)} className="title">
                     {p.title}
                   </a>
                 </li>
               ))}
 
             <li className="view-all">
-              <a href={linkFormat.replace('{{post.id}}', '')}>All posts ...</a>
+              <a href={this._format(linkFormat)}>All posts ...</a>
             </li>
           </ul>
         </nav>
@@ -221,10 +270,7 @@ export default class Blog extends React.Component {
             .sort((a, b) => a.posted < b.posted)
             .map(p => (
               <li key={p.id}>
-                <a
-                  href={linkFormat.replace('{{post.id}}', p.id)}
-                  className="title"
-                >
+                <a href={this._format(linkFormat, p)} className="title">
                   {p.title}
                 </a>
 
