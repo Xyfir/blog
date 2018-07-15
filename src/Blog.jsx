@@ -4,14 +4,14 @@ import React from 'react';
 const Stats = ({ post }) => (
   <ul className="post-stats">
     <li className="group">{post.group}</li>
-    <li className="posted">
+    <li className="posted" title="YYYY-MM-DD">
       Posted on <span className="date">{post.posted}</span>
     </li>
     <li className="author">
       By <span className="name">{post.author}</span>
     </li>
     {post.edited ? (
-      <li className="edited">
+      <li className="edited" title="YYYY-MM-DD">
         Edited on <span className="date">{post.edited}</span>
       </li>
     ) : null}
@@ -157,7 +157,10 @@ export default class Blog extends React.Component {
       <div className="xyfir-blog view-post">
         <article className="blog-post">
           <header>
-            <h1>{post.title}</h1>
+            <h1 className="title">{post.title}</h1>
+            {post.description ? (
+              <p className="description">{post.description}</p>
+            ) : null}
             <Stats post={post} />
           </header>
 
@@ -211,7 +214,9 @@ export default class Blog extends React.Component {
         <ul className="posts">
           {posts
             .filter(
-              p => p.title.indexOf(search) > -1 || p.group.indexOf(search) > -1
+              p =>
+                p.title.toLowerCase().indexOf(search) > -1 ||
+                p.group.toLowerCase().indexOf(search) > -1
             )
             .sort((a, b) => a.posted < b.posted)
             .map(p => (
@@ -222,6 +227,10 @@ export default class Blog extends React.Component {
                 >
                   {p.title}
                 </a>
+
+                {p.description ? (
+                  <p className="description">{p.description}</p>
+                ) : null}
 
                 <Stats post={p} />
               </li>
