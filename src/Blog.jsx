@@ -175,13 +175,13 @@ export default class Blog extends React.Component {
     if (post && post.canonical) {
       // Element already exists
       if (link) {
-        link.href = post.canonical;
+        link.href = this._format(post.canonical, post);
       }
       // Create element
       else {
         link = document.createElement('link');
         link.rel = 'canonical';
-        link.href = post.canonical;
+        link.href = this._format(post.canonical, post);
         link.dataset.xy = true;
         document.head.appendChild(link);
       }

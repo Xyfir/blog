@@ -1,6 +1,6 @@
 {
   "name": "@xyfir/blog",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A simple blog system that's easily integrated into existing sites. Markdown + React + GitHub.",
   "main": "dist/index.js",
   "scripts": {
